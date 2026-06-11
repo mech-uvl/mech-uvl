@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">mech-uvl icon</title>
+  <desc id="desc">A mechanical gear containing a small Croque feature model.</desc>
+  <defs>
+    <style>
+      .navy { fill: #172033; }
+      .mini-connector {
+        fill: none;
+        stroke: #666666;
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .mini-box {
+        fill: #d7e1f2;
+        stroke: #8fa9d2;
+        stroke-width: 2;
+      }
+      .mini-label {
+        fill: #000000;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 42px;
+        font-weight: 400;
+        dominant-baseline: middle;
+        text-anchor: middle;
+      }
+      .mini-marker-open {
+        fill: #ffffff;
+        stroke: #666666;
+        stroke-width: 4;
+      }
+      .mini-marker-filled { fill: #666666; }
+    </style>
+    <mask id="gear-hole" maskUnits="userSpaceOnUse">
+      <rect x="-16" y="-16" width="288" height="288" fill="#ffffff"/>
+      <circle cx="128" cy="128" r="78" fill="#000000"/>
+    </mask>
+    <clipPath id="gear-hole-clip">
+      <circle cx="128" cy="128" r="78"/>
+    </clipPath>
+    <polygon id="gear-tooth" points="101,42 113,4 143,4 155,42 142,53 114,53"/>
+  </defs>
+
+  <g aria-label="Croque feature model inside gear hole" clip-path="url(#gear-hole-clip)">
+    <g transform="translate(48.4 63.8) scale(0.211)">
+      <g aria-label="connectors">
+        <path class="mini-connector" d="M380 124 102 250"/>
+        <path class="mini-connector" d="M380 124 278 250"/>
+        <path class="mini-connector" d="M380 124 460 250"/>
+        <path class="mini-connector" d="M380 124 646 250"/>
+
+        <path class="mini-connector" d="M278 326 206 450"/>
+        <path class="mini-connector" d="M278 326 352 450"/>
+        <path class="mini-connector" d="M261 357 Q278 367 295 357"/>
+      </g>
+
+      <g aria-label="feature boxes">
+        <rect class="mini-box" x="262" y="50" width="230" height="70"/>
+        <text class="mini-label" x="377" y="86">Croque</text>
+
+        <rect class="mini-box" x="17" y="250" width="164" height="70"/>
+        <text class="mini-label" x="99" y="286">Bread</text>
+
+        <rect class="mini-box" x="217" y="250" width="120" height="70"/>
+        <text class="mini-label" x="277" y="286">Top</text>
+
+        <rect class="mini-box" x="389" y="250" width="140" height="70"/>
+        <text class="mini-label" x="459" y="286">Ham</text>
+
+        <rect class="mini-box" x="557" y="250" width="176" height="70"/>
+        <text class="mini-label" x="645" y="286">Cheese</text>
+
+        <rect class="mini-box" x="137" y="450" width="132" height="70"/>
+        <text class="mini-label" x="203" y="486">Gratin</text>
+
+        <rect class="mini-box" x="299" y="450" width="104" height="70"/>
+        <text class="mini-label" x="351" y="486">Egg</text>
+      </g>
+
+      <g aria-label="feature markers">
+        <circle class="mini-marker-filled" cx="102" cy="250" r="17"/>
+        <circle class="mini-marker-open" cx="278" cy="250" r="16"/>
+        <circle class="mini-marker-open" cx="460" cy="250" r="16"/>
+        <circle class="mini-marker-filled" cx="646" cy="250" r="17"/>
+      </g>
+    </g>
+  </g>
+
+  <g aria-label="mechanical gear" mask="url(#gear-hole)">
+    <circle cx="128" cy="128" r="100" class="navy"/>
+    <use href="#gear-tooth" class="navy" transform="rotate(0 128 128)"/>
+    <use href="#gear-tooth" class="navy" transform="rotate(45 128 128)"/>
+    <use href="#gear-tooth" class="navy" transform="rotate(90 128 128)"/>
+    <use href="#gear-tooth" class="navy" transform="rotate(135 128 128)"/>
+    <use href="#gear-tooth" class="navy" transform="rotate(180 128 128)"/>
+    <use href="#gear-tooth" class="navy" transform="rotate(225 128 128)"/>
+    <use href="#gear-tooth" class="navy" transform="rotate(270 128 128)"/>
+    <use href="#gear-tooth" class="navy" transform="rotate(315 128 128)"/>
+  </g>
+</svg>

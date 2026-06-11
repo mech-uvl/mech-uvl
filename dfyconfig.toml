@@ -1,0 +1,9 @@
+includes = ["src/dafny/**/*.dfy"]
+
+[options]
+warn-shadowing = true
+warn-redundant-assumptions = false
+warn-contradictory-assumptions = true
+progress = "Symbol"
+standard-libraries = true
+verify-included-files = true
