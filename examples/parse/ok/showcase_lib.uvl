@@ -1,0 +1,25 @@
+// Copyright (C) 2026 Université d'Orléans
+// Author: Frédéric Loulergue
+// SPDX-License-Identifier: GPL-3.0-only
+//
+// Expected:
+// - parse: OK
+// - build: OK when imported from showcase_root.uvl
+// - check: OK when imported from showcase_root.uvl
+
+namespace showcase.lib
+
+features
+    LibRoot
+        mandatory
+            Flag
+            Metric {Price 3, Weight 1.5}
+            Label {Text 'abc'}
+        alternative
+            ChoiceA
+            ChoiceB
+        optional
+            Helper
+        [1..2]
+            SlotA
+            SlotB

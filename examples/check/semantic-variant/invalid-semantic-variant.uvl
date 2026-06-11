@@ -1,0 +1,14 @@
+// Copyright (C) 2026 Université d'Orléans
+// Author: Frédéric Loulergue
+// SPDX-License-Identifier: GPL-3.0-only
+//
+// Expected:
+// - parse: OK
+// - check with --undef-constraint-as-false --short-circuit and without
+//   --typed-feature-as-bool: CLI rejects the semantic variant itself
+// - check with a well-formed semantic variant: OK
+// - inferred-major when it passes: Boolean
+// - inferred-minors when it passes: none
+
+features
+    A

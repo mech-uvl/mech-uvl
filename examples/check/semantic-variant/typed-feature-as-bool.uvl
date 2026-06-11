@@ -1,0 +1,16 @@
+// Copyright (C) 2026 Université d'Orléans
+// Author: Frédéric Loulergue
+// SPDX-License-Identifier: GPL-3.0-only
+//
+// Expected:
+// - parse: OK
+// - check with --no-typed-feature-as-bool: fail
+// - check with --typed-feature-as-bool: OK
+// - inferred-major when it passes: Type
+// - inferred-minors when it passes: none
+
+features
+    String A
+
+constraints
+    A

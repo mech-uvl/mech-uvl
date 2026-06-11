@@ -1,0 +1,18 @@
+// Copyright (C) 2026 Université d'Orléans
+// Author: Frédéric Loulergue
+// SPDX-License-Identifier: GPL-3.0-only
+//
+// Expected:
+// - parse: OK
+// - check with --attribute-intro declared-only: fail
+// - check with --attribute-intro local: OK
+// - check with --attribute-intro local-scoped: OK
+// - check with --attribute-intro global: OK
+// - inferred-major when it passes: Type
+// - inferred-minors when it passes: string-constraints
+// - introduced types when it passes: B.Name -> String
+
+features
+    Root
+        mandatory
+            B {constraint B.Name < 'x'}

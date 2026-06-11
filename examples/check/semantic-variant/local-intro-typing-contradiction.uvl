@@ -1,0 +1,17 @@
+// Copyright (C) 2026 Université d'Orléans
+// Author: Frédéric Loulergue
+// SPDX-License-Identifier: GPL-3.0-only
+//
+// Expected:
+// - parse: OK
+// - check with --attribute-intro declared-only: fail
+// - check with --attribute-intro local: fail
+// - check with --attribute-intro local-scoped: fail
+// - check with --attribute-intro global: fail
+// - failure when it reaches typing: contradiction
+// - contradictory domains: B.X -> {}
+
+features
+    Root
+        mandatory
+            B {constraint B.X == 1.0 & B.X}

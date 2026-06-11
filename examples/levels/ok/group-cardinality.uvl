@@ -1,0 +1,15 @@
+// Copyright (C) 2026 Université d'Orléans
+// Author: Frédéric Loulergue
+// SPDX-License-Identifier: GPL-3.0-only
+//
+// Expected:
+// - parse: OK
+// - check: OK
+// - inferred-major: Boolean
+// - inferred-minors: GroupCardinality
+
+features
+    A
+        [1..2]
+            B
+            C

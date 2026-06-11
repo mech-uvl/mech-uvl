@@ -1,0 +1,57 @@
+// Copyright (C) 2026 Université d'Orléans
+// Author: Frédéric Loulergue
+// SPDX-License-Identifier: GPL-3.0-only
+//
+// Expected:
+// - parse: OK
+// - build: OK
+// - check: OK
+// - inferred-major: Type
+// - inferred-minors:
+//   GroupCardinality, FeatureCardinality, AggregateFunction, StringConstraints
+
+namespace showcase.root
+
+include
+    Boolean.group-cardinality
+    Arithmetic.feature-cardinality
+    Arithmetic.aggregate-function
+    Type.*
+
+imports
+    showcase_lib
+    showcase_lib as lib
+    nested.showcase_lib as nlib
+
+features
+    Root
+        mandatory
+            Bundle {Enabled, Active true, Count 2, Ratio 1.5, Name 'root', Meta {Owner 'team', Labels ['alpha', 'beta']}}
+            showcase_lib.LibRoot
+            lib.LibRoot
+            nlib.LibRoot
+        optional
+            Integer Counter cardinality [1..3] {Minimum 1}
+            String LocalText
+        or
+            LocalLeft
+            LocalRight
+        alternative
+            LocalA
+            LocalB
+        [1..2]
+            Slot1
+            Slot2
+            Slot3
+
+constraints
+    showcase_lib.LibRoot & lib.LibRoot & nlib.LibRoot
+    showcase_lib.Flag & lib.Flag & nlib.Flag
+    sum(Price, nlib.LibRoot) > 0
+    showcase_lib.Metric.Price > 0
+    lib.Metric.Price > 0
+    nlib.Metric.Price > 0
+    showcase_lib.Label.Text == 'abc'
+    nlib.Label.Text == showcase_lib.Label.Text
+    len(lib.Label.Text) == 3
+    Counter.Minimum >= 1

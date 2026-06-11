@@ -1,0 +1,14 @@
+// Copyright (C) 2026 Université d'Orléans
+// Author: Frédéric Loulergue
+// SPDX-License-Identifier: GPL-3.0-only
+//
+// Expected:
+// - parse: OK
+// - check: fail
+// - reason: duplicate feature identifier
+
+features
+    A
+        optional
+            X
+            X

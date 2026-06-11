@@ -1,0 +1,11 @@
+// Copyright (C) 2026 Université d'Orléans
+// Author: Frédéric Loulergue
+// SPDX-License-Identifier: GPL-3.0-only
+//
+// Expected:
+// - parse: OK
+// - build: OK when imported from import-root.uvl
+// - check: OK when imported from import-root.uvl
+
+features
+    B
