@@ -21,7 +21,7 @@ module UVL_ModelsTypeChecking {
   import opened UVL_Variant
 
   // Recognises the numeric fragment of feature types.
-  function NumericFeatureType(t: FeatureType): bool
+  predicate NumericFeatureType(t: FeatureType)
   {
     t == FTInteger || t == FTReal
   }

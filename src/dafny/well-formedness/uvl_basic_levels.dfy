@@ -8,8 +8,8 @@
 // level requirements and to compute explicit `includes` declarations.
 
 module UVL_Levels {
+  import opened Std.Collections.Seq
   import opened ExtLib.Option
-  import opened ExtLib.SeqFoldLeft
   import opened ExtLib.SeqMap
   import opened UVL_Syntax
 
@@ -54,7 +54,7 @@ module UVL_Levels {
 
   function MaxMajor(levels: seq<MajorLevel>): MajorLevel
   {
-    sfoldl(MaxLevel, BooleanLevel, levels)
+    FoldRight(MaxLevel, levels, BooleanLevel)
   }
 
   predicate ValidLevel(level: LanguageLevel)
@@ -75,7 +75,7 @@ module UVL_Levels {
     if |levels| == 0 then
       TypeLevel
     else
-      MaxMajor(smap((ll: LanguageLevel)=>ll.major, levels))
+      MaxMajor(FMap((ll: LanguageLevel)=>ll.major, levels))
   }
 
   function MinorsOfDecl(level: LanguageLevel): set<MinorLevel>
@@ -92,7 +92,7 @@ module UVL_Levels {
   {
     if |levels| == 0 then
       AllMinors()
-    else sfoldl((acc, ll)=>MinorsOfDecl(ll)+acc, {}, levels)
+    else FoldLeft((acc, ll)=>MinorsOfDecl(ll)+acc, {}, levels)
   }
 
   // One analysis result records both the required major level and the set of
@@ -117,7 +117,7 @@ module UVL_Levels {
     if |chunks| == 0 then
       MkRequiredLevels(BooleanLevel, {})
     else
-      sfoldl(MergeRequiredLevels, chunks[0], chunks[1..])
+      FoldLeft(MergeRequiredLevels, chunks[0], chunks[1..])
   }
 
   // Normalisation of levels specifications: if all minor levels of a major

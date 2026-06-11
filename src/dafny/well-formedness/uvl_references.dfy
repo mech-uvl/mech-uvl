@@ -14,7 +14,6 @@
 
 module UVL_References {
   import opened ExtLib.Option
-  import opened ExtLib.SeqFoldLeft
   import opened ExtLib.SeqSetUnion
   import opened UVL_Syntax
   import opened UVL_TypingEnvironment

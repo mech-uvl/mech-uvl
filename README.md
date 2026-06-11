@@ -127,12 +127,12 @@ Recommended Reading Order:
 1. `well-formedness/uvl_models_typing.dfy` 
 1. `well-formedness/uvl_models_levels.dfy`  
 
-1. `analysis/uvl_check_errors.dfy`
+1. `analysis/uvl_errors.dfy`
 1. `analysis/uvl_type_constraint_solver.dfy`
 1. `analysis/uvl_constraint_sites.dfy`
-1. `analysis/uvl_core_exec.dfy`
-1. `analysis/uvl_local_checks.dfy`
-1. `analysis/uvl_use_checks.dfy`
+1. `analysis/uvl_checks_support.dfy`
+1. `analysis/uvl_checks_local.dfy`
+1. `analysis/uvl_checks_use.dfy`
 1. `analysis/uvl_models_basic_checks.dfy`
 1. `analysis/uvl_type_inference.dfy`
 1. `analysis/uvl_models_typing_checks.dfy`

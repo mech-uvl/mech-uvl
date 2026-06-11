@@ -12,9 +12,8 @@
 module UVL_WellFormedness {
   import opened Std.Collections.Seq
   import opened ExtLib.Option
-  import opened ExtLib.SeqFold
-  import opened ExtLib.SeqMap
   import opened ExtLib.SeqNoDup
+  import opened ExtLib.SeqMap
   import opened UVL_Path
   import opened UVL_Syntax
 
@@ -55,17 +54,17 @@ module UVL_WellFormedness {
     decreases feature
   {
     map[feature.name := AttributeNames(feature.attributes)] +
-    sfold((chunk, acc) => chunk + acc, map[],
-          Flatten(
-            seq(|feature.groups|, i =>
-              if 0 <= i < |feature.groups| then
-                seq(|feature.groups[i].features|, k =>
-                  if 0 <= k < |feature.groups[i].features| then
-                    FeatureAttributeNameMap(feature.groups[i].features[k])
+    FoldRight((acc, chunk) => chunk + acc,
+              Flatten(
+                seq(|feature.groups|, i =>
+                  if 0 <= i < |feature.groups| then
+                    seq(|feature.groups[i].features|, k =>
+                      if 0 <= k < |feature.groups[i].features| then
+                        FeatureAttributeNameMap(feature.groups[i].features[k])
+                      else
+                        map[])
                   else
-                    map[])
-              else
-                []))
+                    [])), map[]
     )
   }
 
@@ -108,12 +107,12 @@ module UVL_WellFormedness {
   {
     (attrDef.value.Some? &&
      ((attrDef.value.value.VRecord? &&
-       HasNoDup(smap((ad: AttributeDef)=>ad.key, attrDef.value.value.attributes)) &&
+       HasNoDup(FMap((ad: AttributeDef)=>ad.key, attrDef.value.value.attributes)) &&
        forall ad :: ad in attrDef.value.value.attributes ==> ValidRecordAttribute(ad))
       || (attrDef.value.value.VVector? &&
           forall av :: av in attrDef.value.value.elements ==>
                          av.VRecord? &&
-                         HasNoDup(smap((ad: AttributeDef)=>ad.key, av.attributes)) &&
+                         HasNoDup(FMap((ad: AttributeDef)=>ad.key, av.attributes)) &&
                          forall ad :: ad in av.attributes ==> ValidRecordAttribute(ad))
       || (!attrDef.value.value.VRecord? && !attrDef.value.value.VVector?)))
     || attrDef.value.None?
