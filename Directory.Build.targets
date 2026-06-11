@@ -1,0 +1,12 @@
+<!--
+  Copyright (C) 2026 Université d'Orléans
+  Author: Frédéric Loulergue
+  SPDX-License-Identifier: GPL-3.0-only
+-->
+<Project>
+
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'external' or '$(MSBuildProjectName)' == 'MechUvl.Dafny'">
+    <Compile Include="$(MSBuildThisFileDirectory)src/tool/DafnyExternal.cs" />
+  </ItemGroup>
+
+</Project>

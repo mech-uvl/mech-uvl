@@ -1,0 +1,59 @@
+<!--
+  Copyright (C) 2026 Université d'Orléans
+  Author: Frédéric Loulergue
+  SPDX-License-Identifier: GPL-3.0-only
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>MechUvl.Dafny</AssemblyName>
+    <RootNamespace>MechUvl.Dafny</RootNamespace>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</RepoRoot>
+    <DafnyProjectFile Condition="'$(DafnyProjectFile)' == ''">$(RepoRoot)/dfyconfig.toml</DafnyProjectFile>
+    <DafnyOutputStem Condition="'$(DafnyOutputStem)' == ''">$(RepoRoot)/obj/dafny/generated/MechUvl</DafnyOutputStem>
+    <GeneratedDafnyDir>$([System.IO.Path]::GetDirectoryName('$(DafnyOutputStem)'))</GeneratedDafnyDir>
+    <DafnyVerifyOnTranslate Condition="'$(DafnyVerifyOnTranslate)' == ''">false</DafnyVerifyOnTranslate>
+    <RequireCleanDafnyTree Condition="'$(RequireCleanDafnyTree)' == ''">true</RequireCleanDafnyTree>
+    <DafnyNoVerifyFlag Condition="'$(DafnyVerifyOnTranslate)' != 'true'">--no-verify</DafnyNoVerifyFlag>
+    <BaseOutputPath Condition="'$(BaseOutputPath)' == ''">$(RepoRoot)/obj/dafny/dotnet/</BaseOutputPath>
+    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)' == ''">$(RepoRoot)/obj/dafny/dotnet-obj/</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <Target Name="CheckCleanDafnyTree"
+          Condition="'$(RequireCleanDafnyTree)' == 'true'">
+    <Exec Command="bash -lc 'git -C &quot;$1&quot; diff --quiet -- src/dafny dfyconfig.toml &amp;&amp; git -C &quot;$1&quot; diff --cached --quiet -- src/dafny dfyconfig.toml &amp;&amp; ! git -C &quot;$1&quot; ls-files --others --exclude-standard src/dafny dfyconfig.toml | grep -q .' _ &quot;$(RepoRoot)&quot;"
+          IgnoreExitCode="true">
+      <Output TaskParameter="ExitCode" PropertyName="DafnyTreeCleanExitCode" />
+    </Exec>
+    <Error Condition="'$(DafnyTreeCleanExitCode)' != '0'"
+           Text="src/dafny or dfyconfig.toml has uncommitted changes. MechUvl.Dafny.csproj only translates a clean Dafny tree." />
+  </Target>
+
+  <Target Name="GenerateDafnySources"
+          BeforeTargets="CoreCompile"
+          DependsOnTargets="CheckCleanDafnyTree">
+    <Error Condition="!Exists('$(DafnyProjectFile)')"
+           Text="Dafny project file not found at $(DafnyProjectFile)." />
+    <RemoveDir Directories="$(GeneratedDafnyDir)" />
+    <MakeDir Directories="$(GeneratedDafnyDir)" />
+    <Message Importance="High"
+             Text="Translating $(DafnyProjectFile) to C#." />
+    <Exec Command='dafny translate cs --output "$(DafnyOutputStem)" --include-runtime $(DafnyNoVerifyFlag) "$(DafnyProjectFile)"' />
+    <ItemGroup>
+      <GeneratedDafnySources Include="$(GeneratedDafnyDir)/*.cs" />
+      <Compile Include="@(GeneratedDafnySources)" />
+    </ItemGroup>
+    <Error Condition="'@(GeneratedDafnySources)' == ''"
+           Text="No generated Dafny C# sources were found in $(GeneratedDafnyDir)." />
+  </Target>
+
+  <Target Name="RemoveDafnyGeneratedDirectories" AfterTargets="Clean">
+    <RemoveDir Directories="$(RepoRoot)/obj/dafny" />
+  </Target>
+
+</Project>

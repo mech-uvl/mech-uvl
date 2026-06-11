@@ -1,0 +1,60 @@
+﻿<!--
+  Copyright (C) 2026 Université d'Orléans
+  Author: Frédéric Loulergue
+  SPDX-License-Identifier: GPL-3.0-only
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>mech-uvl</AssemblyName>
+    <RootNamespace>MechUvl.Tool</RootNamespace>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/../..'))</RepoRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+    <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../build/MechUvl.Dafny.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="DafnyExternal.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Antlr4 Include="../../grammar/uvl/UVLLexer.g4">
+      <AntlrToolJar>$(MSBuildProjectDirectory)/../../.antlr-cache/antlr-4.13.2-complete.jar</AntlrToolJar>
+      <AntOutDir>$(IntermediateOutputPath)Generated</AntOutDir>
+      <AntlrToolJarDownloadDir>$(MSBuildProjectDirectory)/../../.antlr-cache/</AntlrToolJarDownloadDir>
+      <JavaExec>PATH</JavaExec>
+      <LibPath>$(MSBuildProjectDirectory)/../../grammar/uvl</LibPath>
+      <Listener>false</Listener>
+      <Package>MechUvl.Tool.Generated</Package>
+      <Visitor>true</Visitor>
+    </Antlr4>
+    <Antlr4 Include="../../grammar/uvl/UVLParser.g4">
+      <AntlrToolJar>$(MSBuildProjectDirectory)/../../.antlr-cache/antlr-4.13.2-complete.jar</AntlrToolJar>
+      <AntOutDir>$(IntermediateOutputPath)Generated</AntOutDir>
+      <AntlrToolJarDownloadDir>$(MSBuildProjectDirectory)/../../.antlr-cache/</AntlrToolJarDownloadDir>
+      <JavaExec>PATH</JavaExec>
+      <LibPath>$(MSBuildProjectDirectory)/../../grammar/uvl</LibPath>
+      <Listener>false</Listener>
+      <Package>MechUvl.Tool.Generated</Package>
+      <Visitor>true</Visitor>
+    </Antlr4>
+  </ItemGroup>
+
+  <Target Name="RemoveToolBuildDirectories" AfterTargets="Clean">
+    <RemoveDir Directories="$(MSBuildProjectDirectory)/bin" />
+    <RemoveDir Directories="$(MSBuildProjectDirectory)/obj" />
+    <RemoveDir Directories="$(RepoRoot)/obj/dafny" />
+  </Target>
+
+</Project>
