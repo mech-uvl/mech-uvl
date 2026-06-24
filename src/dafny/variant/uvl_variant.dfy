@@ -12,12 +12,12 @@ module UVL_Variant {
   datatype SemVariant = SemVariant(
     attrIntro: AttrIntro,
     typedFeatureAsBool: bool,
-    undefConstraintAsFalse: bool,
+    undefConstraintAs: bool,
     shortCircuit: bool
   )
 
   predicate WF_SemVariant(variant: SemVariant)
   {
-    (variant.undefConstraintAsFalse && variant.shortCircuit) ==> variant.typedFeatureAsBool
+    (!variant.undefConstraintAs && variant.shortCircuit) ==> variant.typedFeatureAsBool
   }
 }

@@ -52,7 +52,7 @@ internal static class Program
     private static string SemanticVariantUsage { get; } =
         "[--attribute-intro declared-only|local|local-scoped|global] " +
         "[--typed-feature-as-bool | --no-typed-feature-as-bool] " +
-        "[--undef-constraint-as-false | --no-undef-constraint-as-false] " +
+        "[--undef-constraint-as-true | --undef-constraint-as-false] " +
         "[--short-circuit | --no-short-circuit]";
 
     private static int Main(string[] args)
@@ -719,7 +719,7 @@ internal static class Program
         Variant._IAttrIntro attrIntro = Variant.AttrIntro.create_DeclaredOnly();
         var attributeIntroSpecified = false;
         bool? typedFeatureAsBool = null;
-        bool? undefConstraintAsFalse = null;
+        bool? undefConstraintAs = null;
         bool? shortCircuit = null;
         var resolved = new List<string>(Math.Max(0, args.Length - startIndex));
 
@@ -786,24 +786,24 @@ internal static class Program
                     typedFeatureAsBool = false;
                     break;
 
-                case "--undef-constraint-as-false":
-                    if (undefConstraintAsFalse.HasValue)
+                case "--undef-constraint-as-true":
+                    if (undefConstraintAs.HasValue)
                     {
-                        errorMessage = "undef-constraint-as-false was specified more than once.";
+                        errorMessage = "undef-constraint-as was specified more than once.";
                         return false;
                     }
 
-                    undefConstraintAsFalse = true;
+                    undefConstraintAs = true;
                     break;
 
-                case "--no-undef-constraint-as-false":
-                    if (undefConstraintAsFalse.HasValue)
+                case "--undef-constraint-as-false":
+                    if (undefConstraintAs.HasValue)
                     {
-                        errorMessage = "undef-constraint-as-false was specified more than once.";
+                        errorMessage = "undef-constraint-as was specified more than once.";
                         return false;
                     }
 
-                    undefConstraintAsFalse = false;
+                    undefConstraintAs = false;
                     break;
 
                 case "--short-circuit":
@@ -857,7 +857,7 @@ internal static class Program
         variant = Variant.SemVariant.create_SemVariant(
             attrIntro,
             typedFeatureAsBool ?? false,
-            undefConstraintAsFalse ?? false,
+            undefConstraintAs ?? true,
             shortCircuit ?? false);
 
         if (!Variant.__default.WF__SemVariant(variant))
