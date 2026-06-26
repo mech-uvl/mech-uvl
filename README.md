@@ -2,7 +2,7 @@
 
 # mech-uvl 
 
-`mech-uvl` is a Dafny-centered formalization and tooling project for the Universal Variability Language (UVL). The repository is organized around one verified core written in Dafny and one executable .NET tool that preprocesses, parses, and pretty-prints UVL files against the official ANTLR grammar. The checks and typing are done by the Dafny code. 
+`mech-uvl` is a Dafny-centered formalization and tooling project for the Universal Variability Language (UVL). The repository is organized around one verified core written in Dafny and one executable .NET tool that preprocesses, parses, and pretty-prints UVL files against the official ANTLR grammar. The well-formedness checks and type checking are done by the Dafny code but called from the CLI written in C#.
 
 Current development version: `0.1.0-dev`.
 Versioning policy: [`VERSIONING.md`](VERSIONING.md).
@@ -84,6 +84,7 @@ Select a non-default semantic variant:
 
 ```sh
 mech-uvl check --attribute-intro global --typed-feature-as-bool path/to/root.uvl
+mech-uvl check --undef-constraint-as-false --short-circuit --typed-feature-as-bool path/to/root.uvl
 ```
 
 Format a UVL file with the default indentation:
@@ -117,8 +118,9 @@ Recommended Reading Order:
 
 1. `variant/uvl_variant.dfy` 
 
-1. `well-formedness/uvl_wf.dfy`             
-1. `well-formedness/uvl_levels.dfy`         
+1. `well-formedness/uvl_basic_wf.dfy`
+1. `well-formedness/uvl_models_wf.dfy`
+1. `well-formedness/uvl_basic_levels.dfy`
 1. `well-formedness/uvl_typing_env.dfy`     
 1. `well-formedness/uvl_imports.dfy`.       
 1. `well-formedness/uvl_references.dfy`         
@@ -142,3 +144,6 @@ Recommended Reading Order:
 1. `frontend/uvl_level_inference.dfy`
 
 1. `semantics/uvl_configuration.dfy`
+1. `semantics/uvl_structural_semantics.dfy`
+1. `semantics/uvl_local_structural_admissibility.dfy`
+1. `semantics/uvl_configuration_projection.dfy`
