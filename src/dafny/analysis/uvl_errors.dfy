@@ -16,6 +16,9 @@ module UVL_Errors {
   // separate from reference and level errors that depend on the model
   // environment.
   datatype LocalWFError =
+    | MissingRootFeature
+    | InvalidCardinality(cardinality: Cardinality)
+    | InvalidRecordAttribute(attribute: AttributeDef)
     | DuplicateFeatureIdentifier(reference: Reference)
     | DuplicateAttributeName(owner: Reference, key: string)
     | DuplicateImportAlias(qualifier: Reference)

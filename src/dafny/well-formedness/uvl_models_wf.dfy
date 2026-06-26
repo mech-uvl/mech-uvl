@@ -16,6 +16,9 @@ module UVL_ModelsWF {
     variant: SemVariant
   ) requires current in models
   {
+    RootFeaturePresent(models[current]) &&
+    ValidCardinalitiesInModel(models[current]) &&
+    ValidRecordAttributesInModel(models[current]) &&
     UniqueIdentifiers(models[current]) &&
     UniqueAttributeNames(models[current]) &&
     UniqueImportAliases(models[current]) &&

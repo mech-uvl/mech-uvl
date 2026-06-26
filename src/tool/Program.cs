@@ -963,6 +963,21 @@ internal static class Program
 
     private static string FormatLocalWFError(CheckErrors._ILocalWFError error)
     {
+        if (error.is_MissingRootFeature)
+        {
+            return "missing root feature";
+        }
+
+        if (error.is_InvalidCardinality)
+        {
+            return $"invalid cardinality {FormatCardinality(error.dtor_cardinality)}";
+        }
+
+        if (error.is_InvalidRecordAttribute)
+        {
+            return $"invalid record attribute '{FromDafnyString(error.dtor_attribute.dtor_key)}'";
+        }
+
         if (error.is_DuplicateFeatureIdentifier)
         {
             return $"duplicate feature identifier '{FormatReference(error.dtor_reference)}'";
@@ -979,6 +994,19 @@ internal static class Program
         }
 
         return $"import qualifiers '{FormatReference(error.dtor_left)}' and '{FormatReference(error.dtor_right)}' are not prefix-free";
+    }
+
+    private static string FormatCardinality(UvlSyntax._ICardinality cardinality)
+    {
+        return cardinality.dtor_upper switch
+        {
+            UvlSyntax.UpperBound_UnboundedUpper => $"[{cardinality.dtor_lower}..*]",
+            UvlSyntax.UpperBound_FiniteUpper finite when finite.dtor_value == cardinality.dtor_lower =>
+                $"[{cardinality.dtor_lower}]",
+            UvlSyntax.UpperBound_FiniteUpper finite =>
+                $"[{cardinality.dtor_lower}..{finite.dtor_value}]",
+            _ => throw new InvalidOperationException($"unsupported upper bound: {cardinality.dtor_upper}"),
+        };
     }
 
     private static string FormatLevelCheckError(CheckErrors._ILevelCheckError error)

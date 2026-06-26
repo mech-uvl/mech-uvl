@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 // This module defines local structural well-formedness for a single feature
-// model. It extracts declared feature names, declared attribute keys, and
-// visible import qualifiers from syntax. Its predicates express uniqueness
-// of feature identifiers, attribute keys, import aliases, and visible
-// qualifiers. The executable local checks are specified against these
-// predicates.
+// model. It extracts local structural data from syntax. Its predicates express
+// root presence, cardinality sanity, record attribute sanity, uniqueness of
+// feature identifiers, attribute keys, import aliases, and visible qualifiers.
+// The executable local checks are specified against these predicates.
 
 module UVL_WellFormedness {
   import opened Std.Collections.Seq
@@ -86,10 +85,11 @@ module UVL_WellFormedness {
       case None => ImportAliases(imports[1..])
   }
 
-  // Checks that a reference is syntactically meaningful: it has at least one
-  // path component and none of them are empty.
+  // Grammar-guaranteed for parsed references; kept as a specification-level
+  // property for later semantic assumptions, not as an executable core check.
   predicate ValidReference(r: Reference)
   {
+    0 < |r| &&
     forall i :: 0 <= i < |r| ==> r[i] != ""
   }
 
@@ -101,21 +101,117 @@ module UVL_WellFormedness {
     case UnboundedUpper => true
   }
 
-  // Checks that all (nested) composite attribute do not have duplicate fields.
+  function WFCardinalitiesInGroupKind(kind: GroupKind): seq<Cardinality>
+  {
+    match kind
+    case CardinalityGroup(cardinality) => [cardinality]
+    case _ => []
+  }
+
+  function WFCardinalitiesInFeature(feature: Feature): seq<Cardinality>
+    decreases feature
+  {
+    (match feature.cardinality
+     case None => []
+     case Some(cardinality) => [cardinality]) +
+    Seq.Flatten(
+      seq(|feature.groups|, i =>
+        if 0 <= i < |feature.groups| then
+          var features := feature.groups[i].features;
+          WFCardinalitiesInGroupKind(feature.groups[i].kind) +
+          Seq.Flatten(
+            seq(|features|, k =>
+              if 0 <= k < |features| then WFCardinalitiesInFeature(features[k])
+              else [])
+          )
+        else [])
+    )
+  }
+
+  function WFCardinalitiesInModel(model: FeatureModel): seq<Cardinality>
+  {
+    match model.rootFeature
+    case None => []
+    case Some(root) => WFCardinalitiesInFeature(root)
+  }
+
+  predicate ValidCardinalitiesInModel(model: FeatureModel)
+  {
+    forall i :: 0 <= i < |WFCardinalitiesInModel(model)| ==>
+                  ValidCardinality(WFCardinalitiesInModel(model)[i])
+  }
+
+  predicate RootFeaturePresent(model: FeatureModel)
+  {
+    model.rootFeature.Some?
+  }
+
+  // Checks that all (nested) composite attribute values do not have duplicate
+  // record fields at the same record level.
+  predicate ValidAttributeValue(value: AttributeValue)
+    decreases value
+  {
+    match value
+    case VRecord(attributes) =>
+      HasNoDup(FMap((ad: AttributeDef)=>ad.key, attributes)) &&
+      forall ad :: ad in attributes ==> ValidRecordAttribute(ad)
+    case VVector(elements) =>
+      forall element :: element in elements ==> ValidAttributeValue(element)
+    case _ =>
+      true
+  }
+
   // Satistifies the predicate if it is not a composite attribute.
   predicate ValidRecordAttribute(attrDef: AttributeDef)
+    decreases attrDef
   {
-    (attrDef.value.Some? &&
-     ((attrDef.value.value.VRecord? &&
-       HasNoDup(FMap((ad: AttributeDef)=>ad.key, attrDef.value.value.attributes)) &&
-       forall ad :: ad in attrDef.value.value.attributes ==> ValidRecordAttribute(ad))
-      || (attrDef.value.value.VVector? &&
-          forall av :: av in attrDef.value.value.elements ==>
-                         av.VRecord? &&
-                         HasNoDup(FMap((ad: AttributeDef)=>ad.key, av.attributes)) &&
-                         forall ad :: ad in av.attributes ==> ValidRecordAttribute(ad))
-      || (!attrDef.value.value.VRecord? && !attrDef.value.value.VVector?)))
-    || attrDef.value.None?
+    attrDef.value.None? || ValidAttributeValue(attrDef.value.value)
+  }
+
+  function RecordAttributesInAttribute(attribute: Attribute): seq<AttributeDef>
+  {
+    match attribute
+    case AValue(attributeDef) => [attributeDef]
+    case _ => []
+  }
+
+  function RecordAttributesInAttributes(attributes: seq<Attribute>): seq<AttributeDef>
+    decreases |attributes|
+  {
+    if |attributes| == 0 then
+      []
+    else
+      RecordAttributesInAttribute(attributes[0]) + RecordAttributesInAttributes(attributes[1..])
+  }
+
+  function RecordAttributesInFeature(feature: Feature): seq<AttributeDef>
+    decreases feature
+  {
+    RecordAttributesInAttributes(feature.attributes) +
+    Seq.Flatten(
+      seq(|feature.groups|, i =>
+        if 0 <= i < |feature.groups| then
+          var features := feature.groups[i].features;
+          Seq.Flatten(
+            seq(|features|, k =>
+              if 0 <= k < |features| then RecordAttributesInFeature(features[k])
+              else [])
+          )
+        else [])
+    )
+  }
+
+  function RecordAttributesInModel(model: FeatureModel): seq<AttributeDef>
+  {
+    match model.rootFeature
+    case None => []
+    case Some(root) => RecordAttributesInFeature(root)
+  }
+
+  predicate ValidRecordAttributesInModel(model: FeatureModel)
+  {
+    forall i :: 0 <= i < |RecordAttributesInModel(model)| ==>
+                  ValidRecordAttribute(RecordAttributesInModel(model)[i])
   }
 
   // Checks that all declared feature names in the tree are pairwise distinct.

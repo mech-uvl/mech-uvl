@@ -3,9 +3,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 // This module executes the structural well-formedness checks that concern one
-// model. It detects duplicate feature identifiers, duplicate declared
-// attribute keys, duplicate import aliases, and prefix conflicts between
-// visible import qualifiers.
+// model. It detects missing roots, invalid cardinalities, invalid record
+// attributes, duplicate feature identifiers, duplicate declared attribute
+// keys, duplicate import aliases, and prefix conflicts between visible import
+// qualifiers.
 // A `None` result establishes the corresponding local well-formedness
 // predicates.
 
@@ -53,6 +54,60 @@ module UVL_LocalChecks {
       duplicate := Some(values[0]);
     } else {
       duplicate := FirstDuplicateString(values[1..], seen + {values[0]});
+    }
+  }
+
+  // Returns the first cardinality that violates the local cardinality sanity
+  // predicate.
+  method FirstInvalidCardinality(
+    cardinalities: seq<Cardinality>
+  ) returns (invalid: option<Cardinality>)
+    ensures invalid.None? ==> forall i :: 0 <= i < |cardinalities| ==> ValidCardinality(cardinalities[i])
+    decreases |cardinalities|
+  {
+    if |cardinalities| == 0 {
+      invalid := None;
+    } else if !ValidCardinality(cardinalities[0]) {
+      invalid := Some(cardinalities[0]);
+    } else {
+      invalid := FirstInvalidCardinality(cardinalities[1..]);
+      if invalid.None? {
+        forall i | 0 <= i < |cardinalities|
+          ensures ValidCardinality(cardinalities[i])
+        {
+          if i == 0 {
+          } else {
+            assert cardinalities[1..][i - 1] == cardinalities[i];
+          }
+        }
+      }
+    }
+  }
+
+  // Returns the first record/vector attribute that violates the local record
+  // attribute sanity predicate.
+  method FirstInvalidRecordAttribute(
+    attributes: seq<AttributeDef>
+  ) returns (invalid: option<AttributeDef>)
+    ensures invalid.None? ==> forall i :: 0 <= i < |attributes| ==> ValidRecordAttribute(attributes[i])
+    decreases |attributes|
+  {
+    if |attributes| == 0 {
+      invalid := None;
+    } else if !ValidRecordAttribute(attributes[0]) {
+      invalid := Some(attributes[0]);
+    } else {
+      invalid := FirstInvalidRecordAttribute(attributes[1..]);
+      if invalid.None? {
+        forall i | 0 <= i < |attributes|
+          ensures ValidRecordAttribute(attributes[i])
+        {
+          if i == 0 {
+          } else {
+            assert attributes[1..][i - 1] == attributes[i];
+          }
+        }
+      }
     }
   }
 
@@ -185,6 +240,9 @@ module UVL_LocalChecks {
     ctx: ModelCoreExecCtx
   ) returns (error: option<LocalWFError>)
     requires ModelCoreStructureCtxOK(model, ctx)
+    ensures error.None? ==> RootFeaturePresent(model)
+    ensures error.None? ==> ValidCardinalitiesInModel(model)
+    ensures error.None? ==> ValidRecordAttributesInModel(model)
     ensures error.None? ==> UniqueIdentifiers(model)
     ensures error.None? ==> UniqueAttributeNames(model)
     ensures error.None? ==> UniqueImportAliases(model)
@@ -192,34 +250,41 @@ module UVL_LocalChecks {
   {
     match model.rootFeature
     case None =>
-      var aliasError := FirstDuplicateImportAlias(model.imports, {});
-      if aliasError.Some? {
-        error := aliasError;
-      } else {
-        error := FirstNonPrefixFreeImportQualifiers(model.imports, []);
-      }
+      error := Some(MissingRootFeature);
     case Some(root) =>
-      var duplicateId := FirstDuplicateReference(ctx.featureIdSeq, {});
-      if duplicateId.Some? {
-        error := Some(DuplicateFeatureIdentifier(duplicateId.value));
+      var invalidCardinality := FirstInvalidCardinality(WFCardinalitiesInModel(model));
+      if invalidCardinality.Some? {
+        error := Some(InvalidCardinality(invalidCardinality.value));
       } else {
-        assert UniqueIdentifiers(model);
-        var attributeError := FirstDuplicateAttributeNameForOwnerSet(
-          ctx.attributeNameSeqs,
-          MapKeys(ctx.attributeNameSeqs)
-        );
-        if attributeError.Some? {
-          error := attributeError;
+        assert ValidCardinalitiesInModel(model);
+        var invalidRecordAttribute := FirstInvalidRecordAttribute(RecordAttributesInModel(model));
+        if invalidRecordAttribute.Some? {
+          error := Some(InvalidRecordAttribute(invalidRecordAttribute.value));
         } else {
-          assert UniqueAttributeNames(model);
-          var aliasError := FirstDuplicateImportAlias(model.imports, {});
-          if aliasError.Some? {
-            error := aliasError;
+          assert ValidRecordAttributesInModel(model);
+          var duplicateId := FirstDuplicateReference(ctx.featureIdSeq, {});
+          if duplicateId.Some? {
+            error := Some(DuplicateFeatureIdentifier(duplicateId.value));
           } else {
-            error := FirstNonPrefixFreeImportQualifiers(model.imports, []);
-            if error.None? {
-              assert UniqueImportAliases(model);
-              assert PrefixFreeImportQualifiers(model);
+            assert UniqueIdentifiers(model);
+            var attributeError := FirstDuplicateAttributeNameForOwnerSet(
+              ctx.attributeNameSeqs,
+              MapKeys(ctx.attributeNameSeqs)
+            );
+            if attributeError.Some? {
+              error := attributeError;
+            } else {
+              assert UniqueAttributeNames(model);
+              var aliasError := FirstDuplicateImportAlias(model.imports, {});
+              if aliasError.Some? {
+                error := aliasError;
+              } else {
+                error := FirstNonPrefixFreeImportQualifiers(model.imports, []);
+                if error.None? {
+                  assert UniqueImportAliases(model);
+                  assert PrefixFreeImportQualifiers(model);
+                }
+              }
             }
           }
         }
