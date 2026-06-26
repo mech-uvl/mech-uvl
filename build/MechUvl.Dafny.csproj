@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <Target Name="CheckCleanDafnyTree"
-          Condition="'$(RequireCleanDafnyTree)' == 'true'">
+          Condition="'$(RequireCleanDafnyTree)' == 'true' and Exists('$(RepoRoot)/.git')">
     <Exec Command="bash -lc 'git -C &quot;$1&quot; diff --quiet -- src/dafny dfyconfig.toml &amp;&amp; git -C &quot;$1&quot; diff --cached --quiet -- src/dafny dfyconfig.toml &amp;&amp; ! git -C &quot;$1&quot; ls-files --others --exclude-standard src/dafny dfyconfig.toml | grep -q .' _ &quot;$(RepoRoot)&quot;"
           IgnoreExitCode="true">
       <Output TaskParameter="ExitCode" PropertyName="DafnyTreeCleanExitCode" />

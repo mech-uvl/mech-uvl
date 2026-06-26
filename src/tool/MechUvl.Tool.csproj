@@ -30,21 +30,19 @@
 
   <ItemGroup>
     <Antlr4 Include="../../grammar/uvl/UVLLexer.g4">
-      <AntlrToolJar>$(MSBuildProjectDirectory)/../../.antlr-cache/antlr-4.13.2-complete.jar</AntlrToolJar>
       <AntOutDir>$(IntermediateOutputPath)Generated</AntOutDir>
-      <AntlrToolJarDownloadDir>$(MSBuildProjectDirectory)/../../.antlr-cache/</AntlrToolJarDownloadDir>
+      <AntlrToolJarDownloadDir>$(RepoRoot)/.antlr-cache/</AntlrToolJarDownloadDir>
       <JavaExec>PATH</JavaExec>
-      <LibPath>$(MSBuildProjectDirectory)/../../grammar/uvl</LibPath>
+      <LibPath>$(RepoRoot)/grammar/uvl</LibPath>
       <Listener>false</Listener>
       <Package>MechUvl.Tool.Generated</Package>
       <Visitor>true</Visitor>
     </Antlr4>
     <Antlr4 Include="../../grammar/uvl/UVLParser.g4">
-      <AntlrToolJar>$(MSBuildProjectDirectory)/../../.antlr-cache/antlr-4.13.2-complete.jar</AntlrToolJar>
       <AntOutDir>$(IntermediateOutputPath)Generated</AntOutDir>
-      <AntlrToolJarDownloadDir>$(MSBuildProjectDirectory)/../../.antlr-cache/</AntlrToolJarDownloadDir>
+      <AntlrToolJarDownloadDir>$(RepoRoot)/.antlr-cache/</AntlrToolJarDownloadDir>
       <JavaExec>PATH</JavaExec>
-      <LibPath>$(MSBuildProjectDirectory)/../../grammar/uvl</LibPath>
+      <LibPath>$(RepoRoot)/grammar/uvl</LibPath>
       <Listener>false</Listener>
       <Package>MechUvl.Tool.Generated</Package>
       <Visitor>true</Visitor>
