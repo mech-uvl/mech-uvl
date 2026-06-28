@@ -32,6 +32,7 @@ The .NET tool currently supports:
 
 - Dafny 4 (tested with Dafny 4.11.0)
 - .NET 8 SDK
+- Java 17 or later
 - Git with submodule support
 
 ## Getting Started with the Tool

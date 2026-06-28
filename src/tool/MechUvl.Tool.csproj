@@ -15,9 +15,19 @@
     <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/../..'))</RepoRoot>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <AntlrVersion>4.13.1</AntlrVersion>
+    <AntlrToolJar>$(RepoRoot)/.antlr-cache/antlr-$(AntlrVersion)-complete.jar</AntlrToolJar>
+    <AntlrToolUrl>https://www.antlr.org/download/antlr-$(AntlrVersion)-complete.jar</AntlrToolUrl>
+    <AntlrGeneratedDir>$(IntermediateOutputPath)Generated</AntlrGeneratedDir>
+    <AntlrJavaExec Condition="'$(AntlrJavaExec)' == '' and '$(JAVA_HOME)' != '' and Exists('$(JAVA_HOME)/bin/java')">$(JAVA_HOME)/bin/java</AntlrJavaExec>
+    <AntlrJavaExec Condition="'$(AntlrJavaExec)' == '' and '$(JAVA_HOME)' != '' and Exists('$(JAVA_HOME)/bin/java.exe')">$(JAVA_HOME)/bin/java.exe</AntlrJavaExec>
+    <AntlrJavaExec Condition="'$(AntlrJavaExec)' == '' and Exists('/usr/bin/java')">/usr/bin/java</AntlrJavaExec>
+    <AntlrJavaExec Condition="'$(AntlrJavaExec)' == ''">java</AntlrJavaExec>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
-    <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,25 +39,34 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Antlr4 Include="../../grammar/uvl/UVLLexer.g4">
-      <AntOutDir>$(IntermediateOutputPath)Generated</AntOutDir>
-      <AntlrToolJarDownloadDir>$(RepoRoot)/.antlr-cache/</AntlrToolJarDownloadDir>
-      <JavaExec>PATH</JavaExec>
-      <LibPath>$(RepoRoot)/grammar/uvl</LibPath>
-      <Listener>false</Listener>
-      <Package>MechUvl.Tool.Generated</Package>
-      <Visitor>true</Visitor>
-    </Antlr4>
-    <Antlr4 Include="../../grammar/uvl/UVLParser.g4">
-      <AntOutDir>$(IntermediateOutputPath)Generated</AntOutDir>
-      <AntlrToolJarDownloadDir>$(RepoRoot)/.antlr-cache/</AntlrToolJarDownloadDir>
-      <JavaExec>PATH</JavaExec>
-      <LibPath>$(RepoRoot)/grammar/uvl</LibPath>
-      <Listener>false</Listener>
-      <Package>MechUvl.Tool.Generated</Package>
-      <Visitor>true</Visitor>
-    </Antlr4>
+    <AntlrGrammar Include="$(RepoRoot)/grammar/uvl/UVLLexer.g4" />
+    <AntlrGrammar Include="$(RepoRoot)/grammar/uvl/UVLParser.g4" />
   </ItemGroup>
+
+  <Target Name="DownloadAntlrToolJar" Condition="!Exists('$(AntlrToolJar)')">
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(AntlrToolJar)'))" />
+    <DownloadFile
+      SourceUrl="$(AntlrToolUrl)"
+      DestinationFolder="$([System.IO.Path]::GetDirectoryName('$(AntlrToolJar)'))"
+      DestinationFileName="$([System.IO.Path]::GetFileName('$(AntlrToolJar)'))"
+      SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="GenerateAntlrSources"
+          DependsOnTargets="DownloadAntlrToolJar"
+          Inputs="@(AntlrGrammar)"
+          Outputs="$(AntlrGeneratedDir)/UVLLexer.cs;$(AntlrGeneratedDir)/UVLParser.cs;$(AntlrGeneratedDir)/UVLParserBaseVisitor.cs;$(AntlrGeneratedDir)/UVLParserVisitor.cs">
+    <MakeDir Directories="$(AntlrGeneratedDir)" />
+    <Exec Command="&quot;$(AntlrJavaExec)&quot; -jar &quot;$(AntlrToolJar)&quot; -Dlanguage=CSharp -o &quot;$(AntlrGeneratedDir)&quot; -lib &quot;$(RepoRoot)/grammar/uvl&quot; -no-listener -visitor -package MechUvl.Tool.Generated @(AntlrGrammar->'&quot;%(FullPath)&quot;', ' ')" />
+  </Target>
+
+  <Target Name="AddAntlrGeneratedSources"
+          BeforeTargets="CoreCompile"
+          DependsOnTargets="GenerateAntlrSources">
+    <ItemGroup>
+      <Compile Include="$(AntlrGeneratedDir)/**/*.cs" />
+    </ItemGroup>
+  </Target>
 
   <Target Name="RemoveToolBuildDirectories" AfterTargets="Clean">
     <RemoveDir Directories="$(MSBuildProjectDirectory)/bin" />

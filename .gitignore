@@ -16,3 +16,4 @@
 *.coveragexml
 
 grammar/.antlr-build/
+src/tool/Generated
