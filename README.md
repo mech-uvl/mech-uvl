@@ -1,10 +1,9 @@
 <img src="assets/logo.svg" alt="mech-uvl logo" width="50%">
 
-# mech-uvl 
+# mech-uvl 0.1
 
 `mech-uvl` is a Dafny-centered formalization and tooling project for the Universal Variability Language (UVL). The repository is organized around one verified core written in Dafny and one executable .NET tool that preprocesses, parses, and pretty-prints UVL files against the official ANTLR grammar. The well-formedness checks and type checking are done by the Dafny code but called from the CLI written in C#.
 
-Current development version: `0.1.0-dev`.
 Versioning policy: [`VERSIONING.md`](VERSIONING.md).
 
 ## Repository Layout
