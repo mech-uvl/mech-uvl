@@ -31,7 +31,7 @@ The .NET tool currently supports:
 ## Requirements
 
 - Dafny 4 (tested with Dafny 4.11.0)
-- .NET 8 SDK or later
+- .NET 8 SDK
 - Git with submodule support
 
 ## Getting Started with the Tool
@@ -48,9 +48,9 @@ Build the .NET tool:
 dotnet build
 ```
 
-You can either put the executable tool `mech-uvl` in you path or use instead:
+You can either add the `mech-uvl` executable to your `PATH`, or run the tool through `dotnet run`.
 
-```
+```sh
 dotnet run --no-restore --no-build --project src/tool/MechUvl.Tool.csproj --
 ```
 
